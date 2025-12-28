@@ -1,120 +1,82 @@
-  # C盘清理大师
+# 🧹 C盘清理大师 Pro (C Drive Cleaner Pro)
 
-一个现代化的 Windows C盘垃圾清理工具，使用 Python + CustomTkinter 开发。
+[![Python](https://img.shields.io/badge/Python-3.10%2B-blue.svg)](https://www.python.org/)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![UI](https://img.shields.io/badge/UI-CustomTkinter-orange.svg)](https://github.com/TomSchimansky/CustomTkinter)
 
-## ✨ 功能特点
+一个专为 Windows 打造的现代化、专业级磁盘空间清理工具。基于 Python + CustomTkinter 开发，提供极速扫描、深度清理和极简的交互体验。
 
-- 🔍 **智能扫描** - 自动检测多种类型的垃圾文件
-- 🗑️ **安全清理** - 选择性清理，不会误删重要文件
-- 📊 **可视化界面** - 直观显示磁盘使用情况和垃圾文件分布
-- 🛡️ **权限保护** - 清理前需要确认，防止误操作
-- 🎨 **现代UI** - 基于 CustomTkinter 的美观界面
+![C盘清理大师 Pro 预览](./preview.png)
 
-## 🗂️ 支持清理的项目
+## ✨ Pro 版核心功能
 
-| 清理项目 | 说明 | 风险等级 |
-|---------|------|----------|
-| 用户临时文件 | 应用程序临时文件 | 🟢 低 |
-| 系统临时文件 | Windows 系统临时文件 | 🟢 低 |
-| Chrome 浏览器缓存 | Google Chrome 缓存 | 🟢 低 |
-| Edge 浏览器缓存 | Microsoft Edge 缓存 | 🟢 低 |
-| Firefox 浏览器缓存 | Mozilla Firefox 缓存 | 🟢 低 |
-| Windows 更新缓存 | 已下载的更新包 | 🟡 中 |
-| 缩略图缓存 | 图片预览缓存 | 🟢 低 |
-| Windows 日志 | 系统日志文件 | 🟡 中 |
-| 预读取文件 | Windows 预加载数据 | 🟡 中 |
-| 回收站 | 已删除的文件 | 🟢 低 |
-| 最近文件记录 | 最近访问记录 | 🟢 低 |
-| 错误报告 | Windows 错误报告 | 🟢 低 |
+- � **全盘扫描支持** - 不止是 C 盘！现已支持扫描所有本地磁盘（D:, E: 等）及一键进行“全盘大扫除”。
+- 🧠 **开发者智能清理** - 专为程序员打造！自动识别并清理超过 180 天未变动的开发项目冗余文件（如 `node_modules`, `venv`, `target`, `bin/obj` 等）。
+- 📊 **可视化存储状态** - 实时显示磁盘占用比例、可用空间及预计清理后的空间，状态一目了然。
+- 🛡️ **安全风险分级** - 每个清理项都标记了风险等级（低/中/高），并默认仅选中安全项，保护重要系统数据。
+- 🎨 **极致现代 UI** - 采用深色模式设计，配备平滑的进度条、动态日志控制台和毛玻璃质感界面。
+- 📝 **实时操作日志** - 详细记录每一个文件的清理状态，确保过程透明可追溯。
 
-## 📦 安装依赖
+## 🗂️ 深度清理覆盖范围
 
+| 分类 | 清理项目 | 风险等级 | 说明 |
+|------|----------|----------|------|
+| **基础清理** | 用户/系统临时文件 | 🟢 低 | 释放应用缓存和系统残留 |
+| **浏览器** | Chrome/Edge/Firefox | 🟢 低 | 清理缓存、代码缓存和 GPU 缓存 |
+| **系统维护** | Windows 更新缓存 | 🟡 中 | 移除已过期的系统更新安装包 |
+| **视觉缓存** | 缩略图/预读取文件 | 🟢 低 | 刷新图标和系统预加载数据 |
+| **个人痕迹** | 最近文件/回收站 | 🟡 中 | 彻底清除已删除数据和访问历史 |
+| **开发者** | **Stale Dev Materials** | � 高 | 智能识别半年未动过的 node_modules/venv 等 |
+
+## � 快速开始
+
+### 1. 环境准备
+确保已安装 Python 3.10 或更高版本。
+
+### 2. 安装依赖
 ```bash
 pip install -r requirements.txt
 ```
 
-或手动安装：
-
-```bash
-pip install customtkinter psutil
-```
-
-## 🚀 使用方法
-
-### 方法一：直接运行（推荐）
-
-以管理员身份运行：
-
+### 3. 运行程序
+**建议以管理员身份运行**，以确保能够清理系统目录：
 ```bash
 python main.py
 ```
 
-### 方法二：打包成 exe
+## 🛠️ 打包为独立程序 (EXE)
 
-使用 PyInstaller 打包：
+如果你想在其他没有 Python 环境的电脑上使用，可以使用 PyInstaller 打包：
 
 ```bash
 pip install pyinstaller
-pyinstaller --onefile --windowed --icon=icon.ico --name="C盘清理大师" main.py
+pyinstaller --noconfirm --onefile --windowed --icon=icon.ico --name="C盘清理大师Pro" --add-data "ui;ui" --add-data "utils;utils" main.py
 ```
 
-生成的 exe 文件在 `dist` 目录下。
+## � 项目结构
 
-## 📖 使用说明
-
-1. **启动程序** - 建议以管理员身份运行以获得完整权限
-2. **点击扫描** - 程序会自动扫描所有垃圾文件
-3. **选择项目** - 勾选想要清理的项目（默认已选中安全项）
-4. **开始清理** - 点击清理按钮，输入 `YES` 确认
-5. **查看结果** - 清理完成后会显示释放的空间
-
-## ⚠️ 注意事项
-
-1. **管理员权限** - 某些系统文件需要管理员权限才能清理
-2. **浏览器缓存** - 清理前请关闭相关浏览器
-3. **回收站** - 清空回收站后文件无法恢复
-4. **系统文件** - 标记为"中"风险的项目请谨慎清理
-
-## 🛠️ 项目结构
-
-```
+```text
 c_drive_cleaner/
-├── main.py              # 程序入口
-├── config.py            # 配置文件
-├── scanner.py           # 扫描模块
-├── cleaner.py           # 清理模块
-├── ui/
-│   ├── __init__.py
-│   └── main_window.py   # 主窗口
-├── utils/
-│   └── __init__.py
-├── requirements.txt     # 依赖列表
-└── README.md           # 说明文档
+├── main.py              # 程序启动入口
+├── config.py            # 全局配置中心 (包含清理规则 & UI 样式)
+├── scanner.py           # 核心扫描引擎 (支持正则匹配 & 深度检测)
+├── cleaner.py           # 安全清理执行器 (支持文件占用重试)
+├── ui/                  # UI 组件库
+│   └── main_window.py   # 现代化的 CustomTkinter 主窗口
+├── utils/               # 通用工具类
+└── requirements.txt     # 项目依赖
 ```
 
-## 🔧 技术栈
+## 🔧 技术选型
 
-- **Python 3.10+**
-- **CustomTkinter** - 现代化 GUI 框架
-- **psutil** - 系统信息获取
-- **Windows API** - 回收站操作
+- **Frontend**: CustomTkinter (现代化 GUI)
+- **Engine**: Python OS/Stat API & Windows Shell API
+- **Monitoring**: psutil (磁盘实时状态监控)
 
-## 📝 开发计划
+## ⚠️ 免责声明
 
-- [ ] 添加定时清理功能
-- [ ] 支持自定义清理规则
-- [ ] 添加清理历史记录
-- [ ] 支持多语言
-- [ ] 添加系统托盘图标
-
-## 📄 许可证
-
-MIT License
-
-## 🤝 贡献
-
-欢迎提交 Issue 和 Pull Request！
+本工具旨在帮助用户通过清理冗余文件来释放空间。虽然我们设置了严格的安全规则，但在清理标记为 **[!] 高风险** 的项目（如开发者模式清理）时，请务必确认相关项目不再需要。作者对因误删导致的数据丢失不承担责任。
 
 ---
 
-**注意**: 本工具仅用于清理垃圾文件，不会删除任何重要数据。使用前请仔细阅读说明。
+**C盘清理大师 Pro** —— 让你的 Windows 运行如飞。
