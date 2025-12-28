@@ -146,6 +146,16 @@ CLEANUP_ITEMS = [
         "risk": "low",
         "enabled": True
     },
+    {
+        "id": "developer_junk",
+        "name": "过期开发项目(node_modules/target等)",
+        "description": "识别超过半年未变动的开发项目中间件",
+        "paths": [], # 由扫描器动态全盘搜索
+        "extensions": None,
+        "risk": "high",
+        "enabled": False,
+        "special": "developer_mode"
+    },
 ]
 
 # 风险等级颜色
@@ -155,10 +165,26 @@ RISK_COLORS = {
     "high": "#F44336",     # 红色
 }
 
+# 开发者智能清理配置
+# 定义需要扫描的项目中间文件夹
+DEVELOPER_CLEAN_RULES = {
+    "node_modules": "Node.js 依赖",
+    "venv": "Python 虚拟环境",
+    ".venv": "Python 虚拟环境",
+    "target": "Java/Rust 编译产物",
+    "bin": "C#/C++ 编译产物",
+    "obj": "C#/C++ 编译中间件",
+    ".gradle": "Gradle 缓存",
+    ".idea": "JetBrains 项目配置",
+}
+
+# 时间阈值：天数（默认180天，即半年未动过的项目）
+AGE_THRESHOLD_DAYS = 180
+
 # UI 配置
 UI_CONFIG = {
-    "window_title": "C盘清理大师",
-    "window_size": "800x650",
+    "window_title": "C盘清理大师 Pro",
+    "window_size": "850x750",
     "theme": "dark-blue",
     "accent_color": "#1f538d",
 }

@@ -38,6 +38,8 @@ class MainWindow(ctk.CTk):
         self.cleaner: Cleaner = None
         self.is_scanning = False
         self.is_cleaning = False
+        self.current_drive = "C:"
+        self.available_drives = Scanner.get_available_drives()
         
         # 创建UI
         self._create_widgets()
@@ -65,6 +67,23 @@ class MainWindow(ctk.CTk):
             corner_radius=5,
             padx=10
         )
+        
+        # ===== 驱动器选择区域 =====
+        self.drive_select_frame = ctk.CTkFrame(self, fg_color="transparent")
+        self.drive_label = ctk.CTkLabel(
+            self.drive_select_frame,
+            text="选择清理对象:",
+            font=ctk.CTkFont(size=13, weight="bold")
+        )
+        
+        drive_options = self.available_drives + ["全部磁盘"]
+        self.drive_menu = ctk.CTkOptionMenu(
+            self.drive_select_frame,
+            values=drive_options,
+            command=self._on_drive_change,
+            width=120
+        )
+        self.drive_menu.set("C:")
         
         # ===== 磁盘状态卡片 =====
         self.stats_frame = ctk.CTkFrame(self)
@@ -208,6 +227,10 @@ class MainWindow(ctk.CTk):
         self.title_label.pack(side="left")
         self.admin_label.pack(side="right")
         
+        self.drive_select_frame.pack(padx=30, pady=2, fill="x")
+        self.drive_label.pack(side="left", padx=(5, 10))
+        self.drive_menu.pack(side="left")
+        
         self.stats_frame.pack(padx=30, pady=5, fill="x")
         self.disk_title.pack(pady=(5, 2))
         self.disk_progress.pack(pady=2, padx=20)
@@ -245,13 +268,44 @@ class MainWindow(ctk.CTk):
         self.log_textbox.configure(state="disabled")
 
     def _update_disk_info(self):
-        usage = get_disk_usage("C:")
-        if usage["total"] > 0:
-            percent = usage["percent"] / 100
-            self.disk_progress.set(percent)
-            self.disk_info_label.configure(
-                text=f"已使用: {usage['used']/(1024**3):.1f}GB  |  可用: {usage['free']/(1024**3):.1f}GB  |  总量: {usage['total']/(1024**3):.1f}GB"
-            )
+        if self.current_drive == "ALL":
+            # 如果是全部磁盘，汇总信息
+            total_cleaned, used_cleaned, free_cleaned = 0, 0, 0
+            for d in self.available_drives:
+                usage = get_disk_usage(d)
+                total_cleaned += usage["total"]
+                used_cleaned += usage["used"]
+                free_cleaned += usage["free"]
+            
+            if total_cleaned > 0:
+                percent = used_cleaned / total_cleaned
+                self.disk_progress.set(percent)
+                self.disk_info_label.configure(
+                    text=f"[ALL] 已用: {used_cleaned/(1024**3):.1f}GB | 可用: {free_cleaned/(1024**3):.1f}GB | 总计: {total_cleaned/(1024**3):.1f}GB"
+                )
+        else:
+            usage = get_disk_usage(self.current_drive)
+            if usage["total"] > 0:
+                percent = usage["percent"] / 100
+                self.disk_progress.set(percent)
+                self.disk_info_label.configure(
+                    text=f"[{self.current_drive}] 已使用: {usage['used']/(1024**3):.1f}GB  |  可用: {usage['free']/(1024**3):.1f}GB  |  总量: {usage['total']/(1024**3):.1f}GB"
+                )
+
+    def _on_drive_change(self, value):
+        """驱动器切换处理"""
+        if value == "全部磁盘":
+            self.current_drive = "ALL"
+            self._log("已切换到: 全部本地磁盘")
+        else:
+            self.current_drive = value
+            self._log(f"已切换到: 磁盘 {value}")
+        
+        self._update_disk_info()
+        # 清空之前的扫描结果，强制重新扫描
+        self.scan_results.clear()
+        self._create_cleanup_items()
+        self.results_size_label.configure(text="共计: 0 B")
 
     def _create_cleanup_items(self):
         for widget in self.scrollable_frame.winfo_children():
@@ -266,7 +320,14 @@ class MainWindow(ctk.CTk):
             frame = ctk.CTkFrame(self.scrollable_frame, fg_color="transparent")
             frame.pack(fill="x", padx=10, pady=2)
             
-            cb = ctk.CTkCheckBox(frame, text=f"{item['name']} ({item['description']})")
+            # 复选框部分
+            risk_tag = ""
+            if item.get("risk") == "high":
+                risk_tag = " [!] 高风险"
+            elif item.get("risk") == "medium":
+                risk_tag = " [?] 中风险"
+                
+            cb = ctk.CTkCheckBox(frame, text=f"{item['name']} ({item['description']}){risk_tag}")
             if item.get("enabled", True) and scan_result.total_size > 0:
                 cb.select()
             cb.pack(side="left", pady=5)
@@ -289,12 +350,23 @@ class MainWindow(ctk.CTk):
         self.is_scanning = True
         self.scan_button.configure(state="disabled")
         self.clean_button.configure(state="disabled")
-        self._log("开始扫描 C 盘垃圾文件...")
+        self.results_size_label.configure(text="正在扫描...")
+        
+        # 清理旧的扫描结果界面
+        for widget in self.scrollable_frame.winfo_children():
+            widget.destroy()
+        self.cleanup_checkboxes.clear()
+        
+        drive_name = "全部磁盘" if self.current_drive == "ALL" else f"{self.current_drive} 盘"
+        self._log(f"开始扫描 {drive_name} 垃圾文件...")
         threading.Thread(target=self._scan_thread, daemon=True).start()
 
     def _scan_thread(self):
         try:
-            self.scanner = Scanner(progress_callback=self._on_scan_progress)
+            self.scanner = Scanner(
+                progress_callback=self._on_scan_progress,
+                drive=self.current_drive
+            )
             self.scan_results = self.scanner.scan_all()
             self.after(0, self._on_scan_complete)
         except Exception as e:
