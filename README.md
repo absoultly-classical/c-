@@ -3,11 +3,11 @@
 [![Python](https://img.shields.io/badge/Python-3.10%2B-blue.svg)](https://www.python.org/)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![UI](https://img.shields.io/badge/UI-CustomTkinter-orange.svg)](https://github.com/TomSchimansky/CustomTkinter)
-[![Download EXE](https://img.shields.io/badge/Download-EXE-blue?style=for-the-badge&logo=windows)](https://github.com/absoultly-classical/c-/releases/latest)
+[![Download EXE](https://img.shields.io/badge/Download-EXE-blue?style=for-the-badge&logo=windows)](https://github.com/absoultly-classical/c-cleaner/releases/latest)
 
 一个专为 Windows 打造的现代化、专业级磁盘空间清理工具。基于 Python + CustomTkinter 开发，提供极速扫描、深度清理和极简的交互体验。
 
-![C盘清理大师 Pro 预览](./preview.png)
+![C盘清理大师 Pro 预览](./c_drive_cleaner/preview.png)
 
 ## ✨ Pro 版核心功能
 
